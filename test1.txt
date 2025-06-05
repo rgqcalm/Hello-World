@@ -1,0 +1,34 @@
+run "testa" {
+    command = plan
+    assert{
+        condition = var.instance_type == "t2.micro"
+        error_message = "Expected an error message"
+    }
+    assert {
+        condition = aws_instance.example.instance_type == "t2.micro"
+        error_message = "Expected instance type to be t2.micro"
+    }
+    assert {
+        condition = aws_instance.example.ami == data.aws_ami.ubuntu.id
+        error_message = "Expected AMI to match the Ubuntu AMI"
+    }
+}
+run "testb" {
+    command = plan
+   
+    assert {
+        condition = aws_security_group.allow_ssh.ingress[0].from_port == 22
+        error_message = "Expected SSH ingress rule to allow port 22"
+    }
+    assert {
+        condition = aws_security_group.allow_ssh.egress[0].from_port == 0
+        error_message = "Expected SSH egress rule to allow all outbound traffic"
+    }
+    assert {
+        condition = anytrue([for rule in aws_security_group.allow_ssh.ingress : rule.from_port == 22]) 
+        error_message = "Expected SSH egress rule to allow all outbound traffic"
+    }
+
+}
+   
+    

@@ -1,0 +1,32 @@
+run "testc" {
+    command = plan
+   # expect_failures = true 
+
+    assert {
+        condition = aws_instance.example.tags["Name"] == "example"
+        error_message = "Expected instance to have a tag 'Name' with value 'test-instance'"
+    }
+    assert {
+        condition = aws_security_group.allow_ssh.tags["Name"] == "allow_ssh"
+        error_message = "Expected security group to have a tag 'Name' with value 'allow_ssh'"
+    }
+    assert {
+        condition = aws_instance.example.instance_type == "t3.micro"
+        error_message = "Expected instance type to be 't3.micro'"
+        
+      
+    }
+    assert {
+        condition = aws_instance.example.subnet_id == module.vpc.public_subnets[0]
+        error_message = "Expected instance to be in the first public subnet of the VPC"
+    }
+    assert {
+        condition = aws_instance.example.ami == data.aws_ami.ubuntu.id
+        error_message = "Expected instance to use the specified Ubuntu AMI"
+    }
+     assert {
+        condition = aws_security_group.allow_ssh.ingress[0].cidr_blocks[0] == "0.0.0.0/0"
+        error_message = "Expected security group ingress rule to allow traffic from 0.0.0.0/0"
+    }
+  
+}

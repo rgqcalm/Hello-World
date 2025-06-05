@@ -1,0 +1,38 @@
+run "validate_inputs" {
+    command=plan
+
+    variables {
+        aws_region = "us-west-2"
+        instance_type = "t2.micro"
+        ami_id = "ami-12345678" # Replace with a valid AMI ID
+        vpc_id = "vpc-12345678" # Replace with a valid VPC ID
+
+       subnet_id = "subnet-12345678" # Replace with a valid Subnet ID
+        security_group_id = "sg-12345678" # Replace with a valid Security Group ID
+        cidr_blocks = {
+            default = "0.0.0/0"
+        }
+    }
+
+    assert {
+        condition = aws_instance.example.tags["Name"] == "example"
+        error_message = "Expected instance to have a tag 'Name' with value 'example'"
+    }
+    assert {
+        condition = aws_security_group.allow_ssh.tags["Name"] == "allow_ssh"
+        error_message = "Expected security group to have a tag 'Name' with value 'allow_ssh'"
+    }
+    assert {
+        condition = aws_instance.example.instance_type == "t2.micro"
+        error_message = "Expected instance type to be 't2.micro'"
+    }
+    assert {
+        condition = aws_instance.example.subnet_id == module.vpc.public_subnets[0]
+        error_message = "Expected instance to be in the first public subnet of the VPC"
+    }
+    assert {
+        condition = aws_instance.example.ami == data.aws_ami.ubuntu.id
+        error_message = "Expected instance to use the specified Ubuntu AMI"
+    }
+
+}
